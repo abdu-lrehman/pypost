@@ -30,8 +30,8 @@ def update_admin(db: Session, admin_id: int, admin_data: dict):
     if admin is None:
         raise HTTPException(status_code=404, detail="admin not found")
 
-    if 'password' in admin_data:
-        admin_data['password'] = hash_password(admin_data['password'])
+    if "password" in admin_data:
+        admin_data["password"] = hash_password(admin_data["password"])
 
     for field, value in admin_data.items():
         setattr(admin, field, value)

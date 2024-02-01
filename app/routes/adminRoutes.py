@@ -4,7 +4,13 @@ from typing import List
 from ..dbconfig.dbconnect import get_db
 from ..models.admin import Admin
 from ..schemas.adminSchema import AdminCreate
-from ..controllers.adminController import create_admin, get_admin, update_admin, delete_admin, get_all_admins
+from ..controllers.adminController import (
+    create_admin,
+    get_admin,
+    update_admin,
+    delete_admin,
+    get_all_admins,
+)
 
 router = APIRouter()
 
@@ -25,7 +31,9 @@ def read_all_admins(db: Session = Depends(get_db)):
 
 
 @router.put("/admins/{admin_id}", response_model=AdminCreate)
-def update_admin_route(admin_id: int, admin: AdminCreate, db: Session = Depends(get_db)):
+def update_admin_route(
+    admin_id: int, admin: AdminCreate, db: Session = Depends(get_db)
+):
     admin_data = admin.model_dump(exclude_unset=True)
     return update_admin(db=db, admin_id=admin_id, admin_data=admin_data)
 

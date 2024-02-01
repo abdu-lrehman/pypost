@@ -1,14 +1,9 @@
 from fastapi import FastAPI, Request, HTTPException
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-import jwt
 from fastapi.responses import JSONResponse
-from sqlalchemy.orm import Session
-from ..dbconfig.dbconnect import get_db  # Ensure the correct relative import
+import jwt
 import time
-from ..models.user import User
-from ..controllers.loginController import get_user, get_admin
+from fastapi.security import HTTPBearer
 from ..dbconfig.dbData import secretkey
-
 
 app = FastAPI()
 security = HTTPBearer()
@@ -17,7 +12,7 @@ security = HTTPBearer()
 def decode_jwt(token: str):
     try:
         decoded_token = jwt.decode(token, secretkey, algorithms=["HS256"])
-        return decoded_token if decoded_token['exp'] >= time.time() else None
+        return decoded_token if decoded_token["exp"] >= time.time() else None
     except jwt.ExpiredSignatureError:
         return None  # Token is expired
     except jwt.DecodeError:
@@ -25,37 +20,44 @@ def decode_jwt(token: str):
 
 
 @app.middleware("http")
-async def db_session_middleware(request: Request, call_next):
-    # Create a new db session and store it in request state
-    request.state.db = next(get_db())
-    response = await call_next(request)
-    # request.state["db"] = next(get_db())
-    print(request.state.db)
-    # request.state.db.close()  # Close the db session
-    return response
-
-
-@app.middleware("http")
 async def auth_middleware(request: Request, call_next):
+    """
+    Middleware for authentication.
+    It checks the token for protected routes.
+    """
     path = request.url.path
 
     # List of routes that don't require authentication
-    non_auth_routes = ["/users/login", "/admins/login",
-                       "/users/register", "/admins/register"]
+    non_auth_routes = [
+        "/users/login",
+        "/admins/login",
+        "/users/register",
+        "/admins/register",
+    ]
 
     if path not in non_auth_routes:
-        token = request.headers.get("Authorization")
-        if token:
-            token = token.split(" ")[1]  # Assuming Bearer token
-            token_data = decode_jwt(token)
-            if token_data:
-                # Use request.state.db for database operations
-                request.state.user = get_user(
-                    token_data['sub'], request.state.db)
-            else:
-                return JSONResponse(content={"error": "Invalid or expired token"}, status_code=401)
+        authorization: str = request.headers.get("Authorization")
+        if authorization:
+            schema, _, token = authorization.partition(" ")
+            if schema and token and schema.lower() == "bearer":
+                token_data = decode_jwt(token)
+                if token_data:
+                    # If needed, you can attach basic token data to request state
+                    request.state.user_info = token_data
+                else:
+                    # Respond with an error if the token is invalid or expired
+                    return JSONResponse(
+                        content={"error": "Invalid or expired token"}, status_code=401
+                    )
+        else:
+            # Respond with an error if no token is provided in a protected route
+            return JSONResponse(
+                content={"error": "Authorization token is required"}, status_code=401
+            )
 
+    # Proceed to the next middleware or route handler if authentication passes
     response = await call_next(request)
     return response
+
 
 # Define your endpoint routes here...

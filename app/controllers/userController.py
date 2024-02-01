@@ -30,8 +30,8 @@ def update_user(db: Session, user_id: int, user_data: dict):
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
-    if 'password' in user_data:
-        user_data['password'] = hash_password(user_data['password'])
+    if "password" in user_data:
+        user_data["password"] = hash_password(user_data["password"])
 
     for field, value in user_data.items():
         setattr(user, field, value)

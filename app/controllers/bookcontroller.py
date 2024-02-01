@@ -6,15 +6,18 @@ from ..schemas.bookSchema import BookCreate
 
 
 def create_book(db: Session, book_data: BookCreate):
-    db_book = Book(title=book_data.title,
-                   author=book_data.author,
-                   published_date=book_data.published_date,
-                   borrowed_by_id=book_data.borrowed_by_id)
+    db_book = Book(
+        title=book_data.title,
+        author=book_data.author,
+        published_date=book_data.published_date,
+        borrowed_by_id=book_data.borrowed_by_id,
+    )
 
     db.add(db_book)
     db.commit()
     db.refresh(db_book)
     return db_book
+
 
 # Get a book by ID
 

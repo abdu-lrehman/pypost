@@ -5,7 +5,13 @@ from ..dbconfig.dbconnect import get_db
 from ..models.user import User
 from ..schemas.userSchema import UserCreate
 
-from ..controllers.userController import create_user, get_user, update_user, delete_user, get_all_users
+from ..controllers.userController import (
+    create_user,
+    get_user,
+    update_user,
+    delete_user,
+    get_all_users,
+)
 
 router = APIRouter()
 

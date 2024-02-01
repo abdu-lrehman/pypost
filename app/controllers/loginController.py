@@ -40,6 +40,6 @@ def create_access_token(data: dict):
     # Set the expiration time for the token (e.g., 1 hour from now)
     expiration = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
     to_encode = data.copy()
-    to_encode['exp'] = expiration
+    to_encode["exp"] = expiration
     encoded_jwt = jwt.encode(to_encode, secretkey, algorithm="HS256")
     return encoded_jwt
