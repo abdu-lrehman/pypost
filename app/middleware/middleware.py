@@ -1,7 +1,7 @@
 import time
 
 import jwt
-from fastapi import FastAPI, HTTPException, Request,  Depends, security
+from fastapi import FastAPI, HTTPException, Request, Depends, security
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
@@ -21,7 +21,9 @@ def decode_jwt(token: str):
         return None
 
 
-def auth_middleware(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
+def auth_middleware(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+) -> dict:
     token = credentials.credentials
     decoded_token = decode_jwt(token)
     if decoded_token is None:

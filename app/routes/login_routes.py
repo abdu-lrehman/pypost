@@ -2,9 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from app.controllers.login_controller import (authenticate_admin,
-                                              authenticate_user,
-                                              create_access_token)
+from app.controllers.login_controller import (
+    authenticate_admin,
+    authenticate_user,
+    create_access_token,
+)
 from app.db_config.db_connect import get_db
 from app.db_config.db_data import callback
 
@@ -23,8 +25,7 @@ async def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    access_token = create_access_token(
-        data={"sub": user.username, "id": user.id})
+    access_token = create_access_token(data={"sub": user.username, "id": user.id})
     return {"access_token": access_token, "token_type": "bearer"}
 
 
@@ -40,6 +41,5 @@ async def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    access_token = create_access_token(
-        data={"sub": admin.username, "id": admin.id})
+    access_token = create_access_token(data={"sub": admin.username, "id": admin.id})
     return {"access_token": access_token, "token_type": "bearer"}
