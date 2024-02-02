@@ -1,14 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Request
-from sqlalchemy.orm import Session
-from ..controllers.loginController import (
-    authenticate_user,
-    create_access_token,
-    authenticate_admin,
-)
-from ..controllers.googleLoginController import oauth, get_google_user
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from ..dbconfig.dbconnect import get_db
-from ..dbconfig.dbData import callback
+from sqlalchemy.orm import Session
+
+from app.controllers.login_controller import (authenticate_admin,
+                                              authenticate_user,
+                                              create_access_token)
+from app.db_config.db_connect import get_db
+from app.db_config.db_data import callback
 
 router = APIRouter()
 
@@ -25,7 +23,8 @@ async def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    access_token = create_access_token(data={"sub": user.username, "id": user.id})
+    access_token = create_access_token(
+        data={"sub": user.username, "id": user.id})
     return {"access_token": access_token, "token_type": "bearer"}
 
 
@@ -41,21 +40,6 @@ async def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    access_token = create_access_token(data={"sub": admin.username, "id": admin.id})
+    access_token = create_access_token(
+        data={"sub": admin.username, "id": admin.id})
     return {"access_token": access_token, "token_type": "bearer"}
-
-
-# @router.post("/login/auth/google")
-# async def login_via_google(request: Request):
-#     redirect_uri = callback
-#     print(redirect_uri)
-#     return await oauth.google.authorize_redirect(request, redirect_uri)
-
-
-# @router.get("/auth/callback")
-# async def auth_callback(request: Request, db: Session = Depends(get_db)):
-#     token = await oauth.google.authorize_access_token(request)
-#     user_info = await get_google_user(token, db)
-
-#     # You can handle the user_info as needed here
-#     return {"user_info": user_info}

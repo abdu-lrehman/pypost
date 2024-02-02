@@ -1,10 +1,10 @@
-from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from app.models.admin import Admin
-from ..schemas.adminSchema import AdminCreate
 from passlib.context import CryptContext
+from sqlalchemy.orm import Session
 
-# Configuration for Passlib
+from app.models.admin import Admin
+from app.schemas.admin_schema import AdminCreate
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 

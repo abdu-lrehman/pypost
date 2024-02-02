@@ -1,12 +1,9 @@
-from fastapi import FastAPI
-from fastapi.responses import JSONResponse
-from .dbconfig.dbconnect import dbconnect
-from .routes.userRoutes import router as userRouter
-from .routes.bookRoutes import router as bookRouter
-from .routes.loginRoutes import router as loginRouter
-from .routes.adminRoutes import router as adminRouter
-from .middleware.middleware import app
-
+from app.db_config.db_connect import dbconnect
+from app.middleware.middleware import app
+from app.routes.admin_routes import router as adminRouter
+from app.routes.book_routes import router as bookRouter
+from app.routes.login_routes import router as loginRouter
+from app.routes.user_routes import router as userRouter
 
 dbconnect()
 

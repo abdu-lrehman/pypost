@@ -1,12 +1,13 @@
-from sqlalchemy.orm import Session
-from passlib.context import CryptContext
-import jwt
-from app.models.user import User
-from app.models.admin import Admin
-from ..dbconfig.dbData import secretkey
 import datetime
 
-# Configuration for Passlib
+import jwt
+from passlib.context import CryptContext
+from sqlalchemy.orm import Session
+
+from app.db_config.db_data import secretkey
+from app.models.admin import Admin
+from app.models.user import User
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
@@ -37,7 +38,6 @@ def authenticate_admin(db: Session, username: str, password: str):
 
 
 def create_access_token(data: dict):
-    # Set the expiration time for the token (e.g., 1 hour from now)
     expiration = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
     to_encode = data.copy()
     to_encode["exp"] = expiration

@@ -1,11 +1,10 @@
-from sqlalchemy.ext.declarative import declarative_base
-from dotenv import load_dotenv
 import os
 from pathlib import Path
 
-# Calculate the path to the .env file
+from dotenv import load_dotenv
+from sqlalchemy.ext.declarative import declarative_base
+
 env_path = Path(__file__).resolve().parent.parent / ".env"
-# Load the .env file
 load_dotenv(dotenv_path=env_path)
 
 DATABASE_URL = os.getenv("DATABASE_URL")

@@ -1,8 +1,8 @@
-from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from ..models.user import User
-from ..models.book import Book
-from ..schemas.bookSchema import BookCreate
+
+from app.models.book import Book
+from app.models.user import User
+from app.schemas.book_schema import BookCreate
 
 
 def create_book(db: Session, book_data: BookCreate):
@@ -19,14 +19,10 @@ def create_book(db: Session, book_data: BookCreate):
     return db_book
 
 
-# Get a book by ID
-
-
 def get_book(db: Session, book_id: int):
     return db.query(Book).filter(Book.id == book_id).first()
 
 
-# Update a user's details
 def update_book(db: Session, book_id: int, updated_data):
     db_book = db.query(Book).filter(Book.id == book_id).first()
     if db_book:
@@ -39,7 +35,6 @@ def update_book(db: Session, book_id: int, updated_data):
     return db_book
 
 
-# Delete a book
 def delete_book(db: Session, book_id: int):
     db_book = db.query(Book).filter(Book.id == book_id).first()
     if db_book:

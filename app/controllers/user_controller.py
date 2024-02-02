@@ -1,10 +1,10 @@
-from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from app.models.user import User
-from ..schemas.userSchema import UserCreate
 from passlib.context import CryptContext
+from sqlalchemy.orm import Session
 
-# Configuration for Passlib
+from app.models.user import User
+from app.schemas.user_schema import UserCreate
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
