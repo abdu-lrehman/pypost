@@ -9,14 +9,3 @@ class BookCreate(BaseModel):
     author: str
     published_date: date
     borrowed_by_id: Optional[int] = None
-
-
-class Book(BaseModel):
-    id: int
-    title: str
-    author: str
-    published_date: date
-    borrowed_by_id: Optional[int] = None
-
-    class Config:
-        orm_mode = True

@@ -12,3 +12,4 @@ class User(Base):
     email = Column(String)
     password = Column(String)
     borrowed_books = relationship("Book", back_populates="borrowed_by")
+    records = relationship("Records", back_populates="user")
