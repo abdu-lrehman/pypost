@@ -73,7 +73,11 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
     response_model=BookCreate,
     dependencies=[Depends(user_dependency)],
 )
-def get_book(book_id: int, db: Session = Depends(get_db)):
+def get_book(
+    book_id: int,
+    db: Session = Depends(get_db),
+    decoded_token: dict = Depends(user_dependency),
+):
     db_book = db.query(Book).filter(Book.id == book_id).first()
 
     if db_book.borrowed_at + timedelta(hours=24) < datetime.utcnow():
@@ -82,12 +86,23 @@ def get_book(book_id: int, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(db_book)
 
-    return db_book
+    if decoded_token.id == db_book.borrowed_by_id:
+        return db_book
+
+    response_data = {
+        "id": db_book.id,
+        "title": db_book.title,
+        "author": db_book.author,
+        "published_date": db_book.published_date,
+        "borrowed_at": db_book.borrowed_at,
+        "borrowed_by_id": db_book.borrowed_by_id,
+    }
+    return response_data
 
 
 @router.get("/user/get_all_books/", dependencies=[Depends(user_dependency)])
 def get_all_books(db: Session = Depends(get_db)):
-    books = db.query(Book).all()
+    books = db.query(Book).defer(Book.content).all()
     return books
 
 

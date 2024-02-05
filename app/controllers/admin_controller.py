@@ -102,6 +102,7 @@ def create_book(book_data: BookCreate, db: Session = Depends(get_db)):
         title=book_data.title,
         author=book_data.author,
         published_date=book_data.published_date,
+        content=book_data.content,
         borrowed_by_id=None,
     )
 
@@ -123,12 +124,13 @@ def get_book(book_id: int, db: Session = Depends(get_db)):
         db_book.borrowed_by_id = None
         db.commit()
         db.refresh(db_book)
+
     return db_book
 
 
 @router.get("/admin/get_all_books/", dependencies=[Depends(admin_dependency)])
 def get_all_books(db: Session = Depends(get_db)):
-    books = db.query(Book).all()
+    books = db.query(Book).defer(Book.content).all()
     return books
 
 

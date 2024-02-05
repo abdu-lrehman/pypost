@@ -13,6 +13,7 @@ class Book(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String)
     author = Column(String)
+    content = Column(String)
     published_date = Column(Date)
     borrowed_at = Column(DateTime(timezone=True), default=datetime.utcnow)
     borrowed_by_id = Column(Integer, ForeignKey("users.id"))
