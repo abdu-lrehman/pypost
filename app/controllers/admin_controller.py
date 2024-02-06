@@ -1,5 +1,3 @@
-from datetime import datetime, timedelta
-
 from fastapi import APIRouter, Depends, HTTPException
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
@@ -90,74 +88,6 @@ def delete_admin(admin_id: int, db: Session = Depends(get_db)):
     db.delete(admin)
     db.commit()
     return {"message": "admin deleted successfully"}
-
-
-@router.post(
-    "/admin/create_book/",
-    response_model=BookCreate,
-    dependencies=[Depends(admin_dependency)],
-)
-def create_book(book_data: BookCreate, db: Session = Depends(get_db)):
-    db_book = Book(
-        title=book_data.title,
-        author=book_data.author,
-        published_date=book_data.published_date,
-        content=book_data.content,
-        borrowed_by_id=None,
-    )
-
-    db.add(db_book)
-    db.commit()
-    db.refresh(db_book)
-    return db_book
-
-
-@router.get(
-    "/admin/find_book/{book_id}",
-    response_model=BookCreate,
-    dependencies=[Depends(admin_dependency)],
-)
-def get_book(book_id: int, db: Session = Depends(get_db)):
-    db_book = db.query(Book).filter(Book.id == book_id).first()
-    if db_book.borrowed_at + timedelta(hours=24) < datetime.utcnow():
-        db_book.borrowed_at = None
-        db_book.borrowed_by_id = None
-        db.commit()
-        db.refresh(db_book)
-
-    return db_book
-
-
-@router.get("/admin/get_all_books/", dependencies=[Depends(admin_dependency)])
-def get_all_books(db: Session = Depends(get_db)):
-    books = db.query(Book).defer(Book.content).all()
-    return books
-
-
-@router.put(
-    "/admin/update_book/{book_id}",
-    response_model=BookCreate,
-    dependencies=[Depends(admin_dependency)],
-)
-def update_book(book_id: int, updated_data: BookCreate, db: Session = Depends(get_db)):
-    db_book = db.query(Book).filter(Book.id == book_id).first()
-    if db_book:
-        db_book.title = updated_data.title
-        db_book.author = updated_data.author
-        db_book.published_date = updated_data.published_date
-        db_book.borrowed_by_id = updated_data.borrowed_by_id
-        db.commit()
-        db.refresh(db_book)
-    return db_book
-
-
-@router.delete("/admin/delete_book/{book_id}", dependencies=[Depends(admin_dependency)])
-def delete_book(book_id: int, db: Session = Depends(get_db)):
-    db_book = db.query(Book).filter(Book.id == book_id).first()
-    if db_book:
-        db.delete(db_book)
-        db.commit()
-    return db_book
 
 
 @router.get("/admin/get_all_users/", dependencies=[Depends(admin_dependency)])

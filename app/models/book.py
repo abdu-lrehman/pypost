@@ -15,6 +15,7 @@ class Book(Base):
     author = Column(String)
     content = Column(String)
     published_date = Column(Date)
+    status = Column(String, default="free")
     borrowed_at = Column(DateTime(timezone=True), default=datetime.utcnow)
     borrowed_by_id = Column(Integer, ForeignKey("users.id"))
 
