@@ -17,7 +17,7 @@ def hash_password(password: str):
     return pwd_context.hash(password)
 
 
-@router.post("/user/register_user", response_model=UserCreate)
+@router.post("/user", response_model=UserCreate)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
     hashed_password = hash_password(user.password)
 
@@ -31,13 +31,14 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     return db_user
 
 
-@router.put(
-    "/user/update_user/{user_id}",
-    response_model=UserCreate,
-    dependencies=[Depends(user_dependency)],
-)
-def update_user(user_id: int, user: UserCreate, db: Session = Depends(get_db)):
+@router.put("/user/{user_id}", response_model=UserCreate)
+def update_user(
+    user: UserCreate,
+    db: Session = Depends(get_db),
+    decoded_token: dict = Depends(user_dependency),
+):
     user_data = user.model_dump(exclude_unset=True)
+    user_id = decoded_token["id"]
     user = db.query(User).filter(User.id == user_id).first()
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
@@ -53,8 +54,11 @@ def update_user(user_id: int, user: UserCreate, db: Session = Depends(get_db)):
     return user
 
 
-@router.delete("/user/delete_user/{user_id}", dependencies=[Depends(user_dependency)])
-def delete_user(user_id: int, db: Session = Depends(get_db)):
+@router.delete("/user/{user_id}", dependencies=[Depends(user_dependency)])
+def delete_user(
+    decoded_token: dict = Depends(user_dependency), db: Session = Depends(get_db)
+):
+    user_id = decoded_token["id"]
     user = db.query(User).filter(User.id == user_id).first()
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
@@ -64,14 +68,24 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
     return {"message": "User deleted successfully"}
 
 
-@router.get(
-    "/user/get_user_records/{user_id}",
-    dependencies=[Depends(user_dependency)],
-)
-def get_user_records(user_id: int, db: Session = Depends(get_db)):
+@router.get("/user")
+def get_user_details(
+    db: Session = Depends(get_db),
+    decoded_token: dict = Depends(user_dependency),
+):
+    user_id = decoded_token["id"]
+    user = db.query(User).filter(User.id == user_id).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="user not found")
+    return user
 
+
+@router.get("/user/record")
+def get_user_records(
+    db: Session = Depends(get_db), decoded_token: dict = Depends(user_dependency)
+):
+    user_id = decoded_token["id"]
     records = db.query(Records).filter(Records.user_id == user_id).first()
-
     if records is None:
         raise HTTPException(status_code=404, detail="user has no records")
     return records

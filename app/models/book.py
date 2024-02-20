@@ -16,7 +16,7 @@ class Book(Base):
     content = Column(String)
     published_date = Column(Date)
     status = Column(String, default="free")
-    borrowed_at = Column(DateTime(timezone=True), default=datetime.utcnow)
+    borrowed_at = Column(DateTime(timezone=True), default=None)
     borrowed_by_id = Column(Integer, ForeignKey("users.id"))
 
     borrowed_by = relationship("User", back_populates="borrowed_books")

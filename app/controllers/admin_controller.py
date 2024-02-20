@@ -28,7 +28,7 @@ def get_all_admins(db: Session = Depends(get_db)):
 
 
 @router.get(
-    "/admin/find_admin/{admin_id}",
+    "/admin/{admin_id}",
     response_model=AdminCreate,
     dependencies=[Depends(admin_dependency)],
 )
@@ -41,7 +41,7 @@ def get_admin(admin_id: int, db: Session = Depends(get_db)):
     return admin
 
 
-@router.post("/admin/register_admin", response_model=AdminCreate)
+@router.post("/admin", response_model=AdminCreate)
 def create_admin(admin: AdminCreate, db: Session = Depends(get_db)):
     hashed_password = hash_password(admin.password)
 
@@ -52,11 +52,11 @@ def create_admin(admin: AdminCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_admin)
 
-    return create_admin(db=db, admin=admin)
+    return db_admin
 
 
 @router.put(
-    "/admin/update_admin/{admin_id}",
+    "/admin/{admin_id}",
     response_model=AdminCreate,
     dependencies=[Depends(admin_dependency)],
 )
@@ -77,9 +77,7 @@ def update_admin(admin_id: int, admin: AdminCreate, db: Session = Depends(get_db
     return admin
 
 
-@router.delete(
-    "/admin/delete_admin/{admin_id}", dependencies=[Depends(admin_dependency)]
-)
+@router.delete("/admin/{admin_id}", dependencies=[Depends(admin_dependency)])
 def delete_admin(admin_id: int, db: Session = Depends(get_db)):
     admin = db.query(Admin).filter(Admin.id == admin_id).first()
     if admin is None:
@@ -90,14 +88,14 @@ def delete_admin(admin_id: int, db: Session = Depends(get_db)):
     return {"message": "admin deleted successfully"}
 
 
-@router.get("/admin/get_all_users/", dependencies=[Depends(admin_dependency)])
+@router.get("/admin/user/", dependencies=[Depends(admin_dependency)])
 def get_all_users(db: Session = Depends(get_db)):
     users = db.query(User).all()
     return users
 
 
 @router.get(
-    "/admin/get_user/{user_id}",
+    "/admin/user/{user_id}",
     response_model=UserCreate,
     dependencies=[Depends(admin_dependency)],
 )
@@ -110,14 +108,14 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
     return user
 
 
-@router.get("/admin/get_all_records/", dependencies=[Depends(admin_dependency)])
+@router.get("/admin/record/user", dependencies=[Depends(admin_dependency)])
 def get_all_records(db: Session = Depends(get_db)):
     records = db.query(Records).all()
     return records
 
 
 @router.get(
-    "/admin/get_user_records/{user_id}",
+    "/admin/record/user/{user_id}",
     dependencies=[Depends(admin_dependency)],
 )
 def get_user_records(user_id: int, db: Session = Depends(get_db)):
@@ -130,7 +128,7 @@ def get_user_records(user_id: int, db: Session = Depends(get_db)):
 
 
 @router.get(
-    "/admin/get_book_records/{book_id}",
+    "/admin/record/book/{book_id}",
     dependencies=[Depends(admin_dependency)],
 )
 def get_book_records(book_id: int, db: Session = Depends(get_db)):
