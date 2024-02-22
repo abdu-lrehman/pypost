@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session, defer
 
 from app.db_config.db_connect import get_db
@@ -13,7 +14,7 @@ from app.schemas.book_schema import BookCreate
 router = APIRouter()
 
 
-def check_time(db_book):
+def __check_time(db_book):
     utc_now_aware = datetime.utcnow().replace(tzinfo=timezone.utc)
     if db_book.borrowed_at + timedelta(hours=24) < utc_now_aware:
         db_book.borrowed_at = None
@@ -21,7 +22,7 @@ def check_time(db_book):
         db_book.status = "free"
 
 
-@router.get("/user/book/{book_id}")
+@router.get("/book/{book_id}")
 def get_book(
     book_id: int,
     db: Session = Depends(get_db),
@@ -33,7 +34,7 @@ def get_book(
         raise HTTPException(status_code=404, detail="Book not found")
 
     if db_book.borrowed_at is not None:
-        check_time(db_book)
+        __check_time(db_book)
         db.commit()
         db.refresh(db_book)
 
@@ -51,12 +52,12 @@ def get_book(
     return response_data
 
 
-@router.get("/user/book/", dependencies=[Depends(user_dependency)])
+@router.get("/book/", dependencies=[Depends(user_dependency)])
 def get_all_books(db: Session = Depends(get_db)):
     books = db.query(Book).options(defer(Book.content)).all()
     for db_book in books:
         if db_book.borrowed_at is not None:
-            check_time(db_book)
+            __check_time(db_book)
             db.commit()
             db.refresh(db_book)
 
@@ -64,7 +65,7 @@ def get_all_books(db: Session = Depends(get_db)):
 
 
 @router.put(
-    "/user/borrow_book/{book_id}",
+    "/borrow_book/{book_id}",
 )
 def borrow_book(
     book_id: int,
@@ -83,11 +84,12 @@ def borrow_book(
         db.add(record)
         db.commit()
         db.refresh(record)
-    return "book borrowed"
+
+    return JSONResponse(content="book borrowed")
 
 
 @router.put(
-    "/user/return_book/{book_id}",
+    "/return_book/{book_id}",
     dependencies=[Depends(user_dependency)],
 )
 def return_book(
@@ -104,7 +106,7 @@ def return_book(
         db.commit()
         db.refresh(db_book)
 
-    return "book returned"
+    return JSONResponse(content="book returned")
 
 
 @router.post(
@@ -140,7 +142,7 @@ def get_book(book_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Book not found")
 
     if db_book.borrowed_at is not None:
-        check_time(db_book)
+        __check_time(db_book)
         db.commit()
         db.refresh(db_book)
 
@@ -152,7 +154,7 @@ def get_all_books(db: Session = Depends(get_db)):
     books = db.query(Book).options(defer(Book.content)).all()
     for db_book in books:
         if db_book.borrowed_at is not None:
-            check_time(db_book)
+            __check_time(db_book)
             db.commit()
             db.refresh(db_book)
     return books

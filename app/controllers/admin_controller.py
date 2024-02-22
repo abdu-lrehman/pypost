@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
-
+from fastapi.responses import JSONResponse
 from app.db_config.db_connect import get_db
 from app.middleware.admin_dependency import admin_dependency
 from app.models.admin import Admin
@@ -14,14 +14,13 @@ from app.schemas.user_schema import UserCreate
 
 router = APIRouter()
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-
-def hash_password(password: str):
+def __hash_password(password: str):
+    pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     return pwd_context.hash(password)
 
 
-@router.get("/admin/get_all_admins/", dependencies=[Depends(admin_dependency)])
+@router.get("/admin", dependencies=[Depends(admin_dependency)])
 def get_all_admins(db: Session = Depends(get_db)):
     admin = db.query(Admin).all()
     return admin
@@ -43,7 +42,7 @@ def get_admin(admin_id: int, db: Session = Depends(get_db)):
 
 @router.post("/admin", response_model=AdminCreate)
 def create_admin(admin: AdminCreate, db: Session = Depends(get_db)):
-    hashed_password = hash_password(admin.password)
+    hashed_password = __hash_password(admin.password)
 
     admin_data = admin.model_dump(exclude={"password"})
     db_admin = Admin(**admin_data, password=hashed_password)
@@ -67,7 +66,7 @@ def update_admin(admin_id: int, admin: AdminCreate, db: Session = Depends(get_db
         raise HTTPException(status_code=404, detail="admin not found")
 
     if "password" in admin_data:
-        admin_data["password"] = hash_password(admin_data["password"])
+        admin_data["password"] = __hash_password(admin_data["password"])
 
     for field, value in admin_data.items():
         setattr(admin, field, value)

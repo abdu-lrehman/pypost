@@ -13,36 +13,38 @@ from app.models.user import User
 
 router = APIRouter()
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+def __verify_password(plain_password, hashed_password):
+    pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def get_user(db: Session, username: str):
-    return db.query(User).filter(User.username == username).first()
+def __get_user(db: Session, username: str):
+    user = db.query(User).filter(User.username == username).first()
+    return user
 
 
-def get_admin(db: Session, username: str):
-    return db.query(Admin).filter(Admin.username == username).first()
+def __get_admin(db: Session, username: str):
+    admin = db.query(Admin).filter(Admin.username == username).first()
+    return admin
 
 
-def authenticate_user(db: Session, username: str, password: str):
-    user = get_user(db, username)
-    if not user or not verify_password(password, user.password):
+def __authenticate_user(db: Session, username: str, password: str):
+    user = __get_user(db, username)
+    if not user or not __verify_password(password, user.password):
         return False
     return user
 
 
-def authenticate_admin(db: Session, username: str, password: str):
-    admin = get_admin(db, username)
-    if not admin or not verify_password(password, admin.password):
+def __authenticate_admin(db: Session, username: str, password: str):
+    admin = __get_admin(db, username)
+    if not admin or not __verify_password(password, admin.password):
         return False
     return admin
 
 
-def create_access_token(data: dict):
+def __create_access_token(data: dict):
     expiration = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
     to_encode = data.copy()
     to_encode["exp"] = expiration
@@ -57,7 +59,7 @@ router = APIRouter()
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
 ):
-    user = authenticate_user(db, form_data.username, form_data.password)
+    user = __authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -65,7 +67,7 @@ async def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    access_token = create_access_token(
+    access_token = __create_access_token(
         data={"sub": user.username, "id": user.id, "userType": "user"}
     )
     return {"access_token": access_token, "token_type": "bearer"}
@@ -75,7 +77,7 @@ async def login_for_access_token(
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
 ):
-    admin = authenticate_admin(db, form_data.username, form_data.password)
+    admin = __authenticate_admin(db, form_data.username, form_data.password)
     if not admin:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -83,7 +85,7 @@ async def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    access_token = create_access_token(
+    access_token = __create_access_token(
         data={"sub": admin.username, "id": admin.id, "userType": "admin"}
     )
     return {"access_token": access_token, "token_type": "bearer"}

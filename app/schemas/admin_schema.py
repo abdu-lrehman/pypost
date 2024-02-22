@@ -1,7 +1,8 @@
-from pydantic import BaseModel, EmailStr, constr, validator
+from pydantic import BaseModel, EmailStr
+from typing import Optional
 
 
 class AdminCreate(BaseModel):
     username: str
     email: EmailStr
-    password: constr(min_length=8) = None
+    password: str = Optional

@@ -2,11 +2,11 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
 
-from app.db_config.db_data import DATABASE_URL, Base
+from app.db_config.db_data import database_url, Base
 from app.models.book import Book
 from app.models.user import User
 
-engine = create_engine(DATABASE_URL)
+engine = create_engine(database_url)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
