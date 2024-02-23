@@ -8,7 +8,7 @@ from app.middleware.user_dependency import app
 dbconnect()
 
 
-app.include_router(userRouter, tags=["users"])
-app.include_router(loginRouter, tags=["login"])
-app.include_router(adminRouter, tags=["admin"])
-app.include_router(bookRouter, tags=["books"])
+app.include_router(userRouter, prefix="/user", tags=["users"])
+app.include_router(loginRouter, prefix="/login", tags=["login"])
+app.include_router(adminRouter, prefix="/admin", tags=["admin"])
+app.include_router(bookRouter, prefix="/book", tags=["books"])

@@ -22,7 +22,7 @@ def __check_time(db_book):
         db_book.status = "free"
 
 
-@router.get("/book/{book_id}")
+@router.get("/{book_id}")
 def get_book(
     book_id: int,
     db: Session = Depends(get_db),
@@ -52,7 +52,7 @@ def get_book(
     return response_data
 
 
-@router.get("/book/", dependencies=[Depends(user_dependency)])
+@router.get("/", dependencies=[Depends(user_dependency)])
 def get_all_books(db: Session = Depends(get_db)):
     books = db.query(Book).options(defer(Book.content)).all()
     for db_book in books:
@@ -110,7 +110,7 @@ def return_book(
 
 
 @router.post(
-    "/admin/book/",
+    "/admin",
     response_model=BookCreate,
     dependencies=[Depends(admin_dependency)],
 )
@@ -131,7 +131,7 @@ def create_book(book_data: BookCreate, db: Session = Depends(get_db)):
 
 
 @router.get(
-    "/admin/book/{book_id}",
+    "/admin/{book_id}",
     response_model=BookCreate,
     dependencies=[Depends(admin_dependency)],
 )
@@ -149,7 +149,7 @@ def get_book(book_id: int, db: Session = Depends(get_db)):
     return db_book
 
 
-@router.get("/admin/book/", dependencies=[Depends(admin_dependency)])
+@router.get("/admin/", dependencies=[Depends(admin_dependency)])
 def get_all_books(db: Session = Depends(get_db)):
     books = db.query(Book).options(defer(Book.content)).all()
     for db_book in books:
@@ -161,7 +161,7 @@ def get_all_books(db: Session = Depends(get_db)):
 
 
 @router.put(
-    "/admin/book/{book_id}",
+    "/admin/{book_id}",
     response_model=BookCreate,
     dependencies=[Depends(admin_dependency)],
 )
@@ -179,7 +179,7 @@ def update_book(book_id: int, updated_data: BookCreate, db: Session = Depends(ge
     return db_book
 
 
-@router.delete("/admin/book/{book_id}", dependencies=[Depends(admin_dependency)])
+@router.delete("/admin/{book_id}", dependencies=[Depends(admin_dependency)])
 def delete_book(book_id: int, db: Session = Depends(get_db)):
     db_book = db.query(Book).filter(Book.id == book_id).first()
     if db_book:

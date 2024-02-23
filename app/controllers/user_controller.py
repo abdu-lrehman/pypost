@@ -19,7 +19,7 @@ def __hash_password(password: str):
     return pwd_context.hash(password)
 
 
-@router.post("/user", response_model=UserCreate)
+@router.post("/", response_model=UserCreate)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
     hashed_password = __hash_password(user.password)
 
@@ -33,7 +33,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     return db_user
 
 
-@router.put("/user/{user_id}", response_model=UserCreate)
+@router.put("/{user_id}", response_model=UserCreate)
 def update_user(
     user: UserCreate,
     db: Session = Depends(get_db),
@@ -58,7 +58,7 @@ def update_user(
     return user
 
 
-@router.delete("/user/{user_id}", dependencies=[Depends(user_dependency)])
+@router.delete("/{user_id}", dependencies=[Depends(user_dependency)])
 def delete_user(
     decoded_token: dict = Depends(user_dependency), db: Session = Depends(get_db)
 ):
@@ -74,7 +74,7 @@ def delete_user(
     return JSONResponse(content="User deleted successfully")
 
 
-@router.get("/user")
+@router.get("/")
 def get_user_details(
     db: Session = Depends(get_db),
     decoded_token: dict = Depends(user_dependency),
@@ -88,7 +88,7 @@ def get_user_details(
     return user
 
 
-@router.get("/user/record")
+@router.get("/record")
 def get_user_records(
     db: Session = Depends(get_db), decoded_token: dict = Depends(user_dependency)
 ):
