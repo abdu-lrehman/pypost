@@ -18,4 +18,3 @@ services:
     depends_on:
       - postgres
     environment:
-      DATABASE_URL: postgres://your_username:your_password@mypostgres:5432/your_database_name
