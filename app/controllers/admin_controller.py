@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import JSONResponse
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
-from fastapi.responses import JSONResponse
+
 from app.db_config.db_connect import get_db
 from app.middleware.admin_dependency import admin_dependency
 from app.models.admin import Admin
