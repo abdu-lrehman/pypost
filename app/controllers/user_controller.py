@@ -1,14 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import JSONResponse
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
-from fastapi.responses import JSONResponse
 
 from app.db_config.db_connect import get_db
 from app.middleware.user_dependency import user_dependency
 from app.models.records import Records
 from app.models.user import User
 from app.schemas.user_schema import UserCreate
-
 
 router = APIRouter()
 

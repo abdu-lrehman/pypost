@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
 
-from app.db_config.db_data import database_url, Base
+from app.db_config.db_data import Base, database_url
 from app.models.book import Book
 from app.models.user import User
 

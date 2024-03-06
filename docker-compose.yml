@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:16.1
+    container_name: mypostgres
+    environment:
+      POSTGRES_DB: nodepost
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: abduabdu
+    ports:
+      - "5432:5432"
+
+  fastapi-app:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    env_file:
+      - .env
